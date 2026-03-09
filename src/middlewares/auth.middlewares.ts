@@ -1,0 +1,1 @@
+// Validaçã de autenticação
