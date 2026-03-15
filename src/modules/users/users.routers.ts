@@ -1,5 +1,5 @@
 import { Router } from "express";
 
-const router = Router();
+const userRouter = Router();
 
-router.get("/me");
+userRouter.get("/me");

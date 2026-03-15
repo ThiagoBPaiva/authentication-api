@@ -1,20 +1,11 @@
-# O que foi feito hoje (ontem)
+# Tasks:
 
--> Inicializei o projeto
+-> Fazer e configurar o Banco de Dados: OK
 
--> Organizei as pastas pela arquitetura "Feature-based Architecture"
+-> Fazer a rota POST: /auth/register: OK
 
--> Inicializer o End-Point: POST /auth/regiter.
+-> Fazer as exigencias minimas para aceitar o JSON do end-point: POST /auth/register: OK
 
--------------------------
-# Tasks para segunda:
+-> Implementar e fazer funcionar o end-point: POST /auth/register: OK
 
--> Fazer e configurar o Banco de Dados
-
--> Fazer as exigencias minimas para aceitar o JSON do end-point: POST /auth/register
-
--> Implementar e fazer funcionar o end-point: POST /auth/register
-
-ADICIONAIS PARA SEGUNDA:
-
--> Trabalhar na logica das autenticações "accessToken" e "refreshToken".
+-> Salvar o usuario no banco de dados: 
