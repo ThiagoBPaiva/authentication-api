@@ -5,12 +5,12 @@ import { User } from "../../utils/User";
 import { ulid } from "ulid";
 
 
-export class authDataBase {
+export class AuthDataBase {
     private id = ulid();
 
-    protected async createNewUser(user: User): Promise<ResultSetHeader> {
+    private async createUserMethode(user: User): Promise<ResultSetHeader> {
         try {
-            const dbCode: string = "INSERT INTO Users (idUser, nameUser, emailUser, passwordUser, role) VALUES (?, ?, ?, ?, ?)"
+            const dbCode: string = "INSERT INTO User (idUser, nameUser, userEmail, userPassword, role) VALUES (?, ?, ?, ?, ?)"
             const value: Array<string | number> = [this.id, user.name, user.email, user.password, user.role ];
 
             const [rows] = await dataBase.execute<ResultSetHeader>(dbCode, value);
@@ -18,5 +18,24 @@ export class authDataBase {
         } catch (err) {
             throw new Error(`Error in create user: ${err}`);
         }
+    }
+
+    private async getEmailMethode(email: string): Promise<RowDataPacket[]> {
+        try {
+            const dbCode: string = "SELECT * FROM User WHERE userEmail = ?";
+
+            const [rows] = await dataBase.execute<RowDataPacket[]>(dbCode, [email]);
+            return rows;
+        } catch (err) {
+            throw new Error(`Error in get Email: ${err}`);
+        }
+    }
+
+    public async createUser(user: User): Promise<ResultSetHeader> {
+        return await this.createUserMethode(user);
+    }
+
+    public async getEmail(email: string): Promise<RowDataPacket[]> {
+        return await this.getEmailMethode(email);
     }
 }

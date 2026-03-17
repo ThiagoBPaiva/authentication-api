@@ -1,4 +1,4 @@
 .env
-./node_modules
-./tasks.txt
-
+node_modules
+tasks.txt
+database.mwb

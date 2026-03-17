@@ -1,4 +1,9 @@
 import * as z from "zod"
+import { AuthDataBase } from "./auth.repository"
+import { User } from "../../utils/User"
+import { hash, compare } from "bcrypt";
+import { randomInt } from "node:crypto";
+import { ROLE } from "../../utils/enums";
 
 const UserJson = z.object({
     name: z.string().min(1),
@@ -8,26 +13,37 @@ const UserJson = z.object({
 
 type UserTDO = z.infer<typeof UserJson>
 
-type returnJSON = {
-    status: number
-    message: z.ZodIssue[] | UserTDO
-}
+type ServiceRresponse<T> =
+    { success: true, data: T }
+    | { success: false, error: string }
 
 export class AuthService {
+    constructor (private data: AuthDataBase) {}
 
-    public async validationJSON(json: UserTDO): Promise<returnJSON> {
-        const validation = UserJson.safeParse(json);
-
-        if (!validation.success) {
-            return {
-                status: 400,
-                message: validation.error.issues
+    public async registerUser(user: UserTDO): Promise<ServiceRresponse<User>> {
+        try {
+            const validation = UserJson.safeParse(user);
+            if (!validation.data) {
+                return { success: false, error: "Invaid data" }
             }
-        }
 
-        return {
-            status: 200,
-            message: validation.data
+            const isEmail = await this.data.getEmail(user.email);
+            if (isEmail.length > 0) {
+                return { success: false, error: "Email not valid or inexistent" }
+            }
+
+            const hashPassword = await hash(String(user.password), randomInt(10, 16)); // Criptografando a senha
+
+            const newUser = new User(user.name, user.email, hashPassword, ROLE.USER);
+
+            await this.data.createUser(newUser);
+
+            return {
+                success: true,
+                data: newUser
+            };
+        } catch (err) {
+            throw new Error(String(err));
         }
     }
 }
