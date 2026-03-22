@@ -3,7 +3,8 @@ import { AuthDataBase } from "./auth.repository"
 import { User } from "../../utils/User"
 import { hash, compare } from "bcrypt";
 import { randomInt } from "node:crypto";
-import { ROLE } from "../../utils/enums";
+import { ROLE } from "../../utils/Enums";
+import { dataBaseTest } from "../../utils/dataBaseTest";
 
 const UserJson = z.object({
     name: z.string().min(1),
@@ -14,33 +15,38 @@ const UserJson = z.object({
 type UserTDO = z.infer<typeof UserJson>
 
 type ServiceRresponse<T> =
-    { success: true, data: T }
+    { success: true, data: {name: string, email: string} }
     | { success: false, error: string }
 
 export class AuthService {
-    constructor (private data: AuthDataBase) {}
+    constructor(private data: AuthDataBase) {}
+    // constructor (private data: any) {}
 
     public async registerUser(user: UserTDO): Promise<ServiceRresponse<User>> {
         try {
             const validation = UserJson.safeParse(user);
             if (!validation.data) {
-                return { success: false, error: "Invaid data" }
+                return { success: false, error: "Invalid data" }
             }
 
             const isEmail = await this.data.getEmail(user.email);
             if (isEmail.length > 0) {
-                return { success: false, error: "Email not valid or inexistent" }
+                return { success: false, error: "Email existing" }
             }
 
             const hashPassword = await hash(String(user.password), randomInt(10, 16)); // Criptografando a senha
 
             const newUser = new User(user.name, user.email, hashPassword, ROLE.USER);
 
-            await this.data.createUser(newUser);
+            // await this.data.createUser(newUser);
+            await dataBaseTest.save(newUser);
 
             return {
                 success: true,
-                data: newUser
+                data: {
+                    name: user.name,
+                    email: user.email
+                }
             };
         } catch (err) {
             throw new Error(String(err));
